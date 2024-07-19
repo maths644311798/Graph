@@ -4,7 +4,7 @@
 #include <random>
 #include "Graph.h"
 
-const size_t total_node = 30000;
+const size_t total_node = 20000;
 
 void RandomGraph(Graph &graph)
 {
@@ -23,6 +23,10 @@ Graph graph(4, 90, {0, 0}, {1.5, 1.5});
 
 int main()
 {
-
+    RandomGraph(graph);
+    graph.ComputeCell();
+    std::ofstream of("graph.csv");
+    graph.Serialize(of);
+    of.close();
     return 0;
 }
