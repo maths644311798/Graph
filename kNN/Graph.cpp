@@ -22,6 +22,24 @@ std::ostream &operator<<(std::ostream &os, const Graph::Cell &o_cell)
     return os;
 }
 
+std::istream &operator>>(std::istream &is, Graph::Node &i_node)
+{
+    char c;
+    is >> i_node.x >> c >> i_node.y;
+    return is;
+}
+
+std::istream &operator>>(std::istream &is, Graph::Cell &i_cell)
+{
+    char c;
+    is >> i_cell.left_down_corner;
+    c = is.get();
+    if(c == '\r')
+        c = is.get();
+    is >> i_cell.right_up_corner;
+    return is;
+}
+
 void Graph::ComputeCell()
 {
     std::cout << "Computing Cell\n";
@@ -88,9 +106,47 @@ void Graph::Serialize(std::ostream &of)
     {
         of << o_node << "\n";
     }
-    for(auto &o_cell : cell)
-    {
-        of << o_cell << "\n";
-    }
 }
 
+
+void Graph::Deserialize(std::istream &input)
+{
+    char c;
+    input >> k >> c >> n;
+    c = input.get();
+    if(c == '\r')
+        c = input.get();
+    input >> left_down_corner;
+    c = input.get();
+    if(c == '\r')
+        c = input.get();
+    input >> right_up_corner;
+    c = input.get();
+    if(c == '\r')
+        c = input.get();
+
+    //test
+    std::cout << "Deserializing\n";
+    std::cout << k << " " << n << "\n";
+
+    std::cout << "left_down " << left_down_corner << "\n";
+    std::cout << "right up " << right_up_corner << "\n";
+
+    size_t node_size;
+    input >> node_size;
+    c = input.get();
+    if(c == '\r')
+        c = input.get();
+
+    std::cout << "node_size = " << node_size << "\n";
+
+    Node temp;
+    for(size_t i = 0; i < node_size; ++i)
+    {
+        input >> temp;
+        c = input.get();
+        if(c == '\r')
+            c = input.get();
+        node.emplace(temp);
+    }
+}

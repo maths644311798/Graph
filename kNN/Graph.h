@@ -46,6 +46,7 @@ class Graph
     std::set<Node, CompareNode> node;
     std::vector<Cell> cell;
 
+    Graph(){}
     Graph(size_t o_k, size_t o_n, Node o_left_down_corner, Node o_right_up_corner);
 
     inline static double DistanceSquare(const Node &p, const Node &q)
@@ -62,8 +63,12 @@ class Graph
     void ComputeCell();
 
     void Serialize(std::ostream &of);
+    void Deserialize(std::istream &input);
 
 };
 
 std::ostream &operator<<(std::ostream &os, const Graph::Node &o_node);
 std::ostream &operator<<(std::ostream &os, const Graph::Cell &o_cell);
+
+std::istream &operator>>(std::istream &is, Graph::Node &i_node);
+std::istream &operator>>(std::istream &is, Graph::Cell &i_cell);
