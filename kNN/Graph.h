@@ -1,9 +1,12 @@
 //Graph.h
-#include<fstream>
-#include<vector>
-#include<array>
-#include<set>
-#include<cmath>
+#include <fstream>
+#include <vector>
+#include <array>
+#include <set>
+#include <cmath>
+#include <numbers>
+#include <iomanip>
+
 
 //k nearest neighbor, n * n cells
 class Graph
@@ -47,6 +50,11 @@ class Graph
     std::vector<Cell> cell;
 
     Graph(){}
+
+    Graph(size_t o_k, size_t o_n)
+    :k(o_k), n(o_n)
+    {}
+
     Graph(size_t o_k, size_t o_n, Node o_left_down_corner, Node o_right_up_corner);
 
     inline static double DistanceSquare(const Node &p, const Node &q)

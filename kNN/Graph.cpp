@@ -10,7 +10,7 @@ Graph::Graph(size_t o_k, size_t o_n, Node o_left_down_corner, Node o_right_up_co
 
 std::ostream &operator<<(std::ostream &os, const Graph::Node &o_node)
 {
-    os << o_node.x << "," << o_node.y;
+    os << std::setprecision(12) << o_node.x << "," << o_node.y;
     return os;
 }
 
@@ -24,8 +24,12 @@ std::ostream &operator<<(std::ostream &os, const Graph::Cell &o_cell)
 
 std::istream &operator>>(std::istream &is, Graph::Node &i_node)
 {
-    char c;
+    char c, temp[200];
+    //assume the format is longitude, latitude, name, comment
     is >> i_node.x >> c >> i_node.y;
+    //Names and comments are abandoned
+    is.getline(temp, 200, ',');
+    is.getline(temp, 200, '\n');
     return is;
 }
 
@@ -112,41 +116,33 @@ void Graph::Serialize(std::ostream &of)
 void Graph::Deserialize(std::istream &input)
 {
     char c;
-    input >> k >> c >> n;
-    c = input.get();
-    if(c == '\r')
-        c = input.get();
-    input >> left_down_corner;
-    c = input.get();
-    if(c == '\r')
-        c = input.get();
-    input >> right_up_corner;
-    c = input.get();
-    if(c == '\r')
-        c = input.get();
 
     //test
     std::cout << "Deserializing\n";
-    std::cout << k << " " << n << "\n";
-
-    std::cout << "left_down " << left_down_corner << "\n";
-    std::cout << "right up " << right_up_corner << "\n";
-
-    size_t node_size;
-    input >> node_size;
-    c = input.get();
-    if(c == '\r')
-        c = input.get();
-
-    std::cout << "node_size = " << node_size << "\n";
 
     Node temp;
-    for(size_t i = 0; i < node_size; ++i)
+    input >> temp;
+    node.emplace(temp);
+    std::cout << "First Node " << temp << "\n";
+    left_down_corner = temp;
+    right_up_corner = temp;
+
+    size_t counter = 1;
+
+    while(!input.eof() && (input >> temp))
     {
-        input >> temp;
-        c = input.get();
-        if(c == '\r')
-            c = input.get();
         node.emplace(temp);
+        left_down_corner.x = std::min(left_down_corner.x, temp.x);
+        left_down_corner.y = std::min(left_down_corner.y, temp.y);
+        right_up_corner.x = std::max(right_up_corner.x, temp.x);
+        right_up_corner.y = std::max(right_up_corner.y, temp.y);
+        ++counter;
     }
+
+    std::cout << "counter = " << counter << "\n";
+
+    std::cout << k << " " << n << "\n";
+    std::cout << "left_down " << left_down_corner << "\n";
+    std::cout << "right up " << right_up_corner << "\n";
+    std::cout << "total node " <<  node.size() << '\n';
 }

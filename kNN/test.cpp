@@ -5,8 +5,8 @@
 
 int main()
 {
-    Graph graph;
-    std::ifstream in_file("graph.csv");
+    Graph graph(4, 90);
+    std::ifstream in_file("Florida Hospitals.csv");
     graph.Deserialize(in_file);
     graph.ComputeCell();
     in_file.close();
