@@ -4,9 +4,11 @@
 #include <array>
 #include <set>
 #include <cmath>
+#include <cstring>
 #include <numbers>
 #include <iomanip>
 
+#define DEBUG_INFO
 
 //k nearest neighbor, n * n cells
 class Graph

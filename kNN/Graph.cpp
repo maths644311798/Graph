@@ -29,7 +29,15 @@ std::istream &operator>>(std::istream &is, Graph::Node &i_node)
     is >> i_node.x >> c >> i_node.y;
     //Names and comments are abandoned
     is.getline(temp, 200, ',');
+#ifdef DEBUG_INFO
+    if(std::strlen(temp) > 190)
+        std::cout << "Long name: " << temp << "\n";
+#endif
     is.getline(temp, 200, '\n');
+#ifdef DEBUG_INFO
+    if(std::strlen(temp) > 190)
+        std::cout << "Long comment: " << temp << "\n";
+#endif
     return is;
 }
 
@@ -123,11 +131,15 @@ void Graph::Deserialize(std::istream &input)
     Node temp;
     input >> temp;
     node.emplace(temp);
+#ifdef DEBUG_INFO
     std::cout << "First Node " << temp << "\n";
+#endif
     left_down_corner = temp;
     right_up_corner = temp;
 
+#ifdef DEBUG_INFO
     size_t counter = 1;
+#endif
 
     while(!input.eof() && (input >> temp))
     {
@@ -136,13 +148,16 @@ void Graph::Deserialize(std::istream &input)
         left_down_corner.y = std::min(left_down_corner.y, temp.y);
         right_up_corner.x = std::max(right_up_corner.x, temp.x);
         right_up_corner.y = std::max(right_up_corner.y, temp.y);
+#ifdef DEBUG_INFO
         ++counter;
+#endif
     }
 
+#ifdef DEBUG_INFO
     std::cout << "counter = " << counter << "\n";
-
     std::cout << k << " " << n << "\n";
     std::cout << "left_down " << left_down_corner << "\n";
     std::cout << "right up " << right_up_corner << "\n";
     std::cout << "total node " <<  node.size() << '\n';
+#endif
 }
