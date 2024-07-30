@@ -19,6 +19,13 @@ std::ostream &operator<<(std::ostream &os, const Graph::Cell &o_cell)
     os << o_cell.left_down_corner << "\n";
     os << o_cell.right_up_corner;
     //The inside nodes and k nearest nodes are computed and are not stored in files.
+#ifdef DEBUG_INFO
+    os << "nearest k nodes:\n";
+    for(auto p = o_cell.k_nearest_node.begin(); p!=o_cell.k_nearest_node.end(); ++p)
+    {
+        os << "\t" << *(p->p) << "\n";
+    }
+#endif
     return os;
 }
 
@@ -66,12 +73,7 @@ void Graph::ComputeCell()
         cell.emplace_back( ld_c, ru_c );
     }
 
-    struct NodeWithCenter
-    {
-        public:
-        const Node *p;
-        const Node *Center;
-    } node_with_center[node.size()];
+    NodeWithCenter node_with_center[node.size()];
 
     for(auto &p : node)
     {
@@ -93,17 +95,24 @@ void Graph::ComputeCell()
 
     for(auto &one_cell : cell)
     {
-        Node Center({(one_cell.left_down_corner.x + one_cell.right_up_corner.x) / 2,
-                    (one_cell.left_down_corner.y + one_cell.right_up_corner.y) / 2});
-        std::set<NodeWithCenter, CentralizedCompare> nearest_pointer;
-        for(auto &p : node)
+        one_cell.center = Node({(one_cell.left_down_corner.x + one_cell.right_up_corner.x) / 2,
+                                (one_cell.left_down_corner.y + one_cell.right_up_corner.y) / 2});
+        double radius = 0;
+        auto p = node.begin();
+        for(index = 0; index < k; ++index, ++p)
         {
-            nearest_pointer.emplace(&p, &Center);
+            one_cell.k_nearest_node.emplace(&(*p), &(one_cell.center));
+            radius = std::max(radius, DistanceSquare(*p, one_cell.center));
         }
-        index = 0;
-        for(auto it = nearest_pointer.cbegin(); index < k; ++index)
+        for(; p!=node.end(); ++p)
         {
-            one_cell.k_nearest_node.emplace(*it->p);
+            double temp_dis = DistanceSquare(*p, one_cell.center);
+            if(temp_dis < radius)
+            {
+                one_cell.k_nearest_node.erase(--one_cell.k_nearest_node.end());
+                one_cell.k_nearest_node.emplace(&(*p), &(one_cell.center));
+                radius = temp_dis;
+            }
         }
     }
 }

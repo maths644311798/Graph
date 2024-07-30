@@ -5,8 +5,8 @@
 #include <set>
 #include <cmath>
 #include <cstring>
-#include <numbers>
 #include <iomanip>
+#include <list>
 
 #define DEBUG_INFO
 
@@ -22,7 +22,13 @@ class Graph
         double x, y;
     };
 
-    
+    struct NodeWithCenter
+    {
+        public:
+        const Node *p;
+        const Node *Center;
+    };
+
     class CompareNode
     {
     public:
@@ -32,18 +38,30 @@ class Graph
         }
     };
 
+    class CentralizedCompare
+    {
+        public:
+        bool operator()(const NodeWithCenter& p1, const NodeWithCenter& p2) const
+        {
+            return DistanceSquare(*p1.p, *p1.Center) < DistanceSquare(*p2.p, *p2.Center);
+        }
+    };
+
     struct Cell
     {
         public:
-        Node left_down_corner, right_up_corner;
+        Node left_down_corner, right_up_corner, center;
         std::vector<const Node*> in_cell_node;
-        std::set<Node, CompareNode> k_nearest_node;
+        std::set<NodeWithCenter, CentralizedCompare> k_nearest_node;
 
         Cell(){};
 
         Cell(const Node &ld_c, const Node &ru_c)
         :left_down_corner(ld_c), right_up_corner(ru_c)
-        {}
+        {
+            center.x = (left_down_corner.x + right_up_corner.x) / 2;
+            center.y = (left_down_corner.y + right_up_corner.y) / 2;
+        }
     };
 
     size_t k, n;

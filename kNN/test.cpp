@@ -6,7 +6,7 @@
 int main()
 {
     Graph graph(4, 90);
-    std::ifstream in_file("Florida Hospitals.csv");
+    std::ifstream in_file("State & Provincial Parks USA & Canada.csv");
     graph.Deserialize(in_file);
     graph.ComputeCell();
     in_file.close();
@@ -23,7 +23,7 @@ int main()
 
     {
         auto it = graph.cell.begin();
-        for(size_t i=0; i < 10; ++i)
+        for(size_t i=0; i < 5; ++i)
         {
             std::cout << *it << "\n";
             it++;
