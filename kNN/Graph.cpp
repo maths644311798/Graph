@@ -20,7 +20,7 @@ std::ostream &operator<<(std::ostream &os, const Graph::Cell &o_cell)
     os << o_cell.right_up_corner;
     //The inside nodes and k nearest nodes are computed and are not stored in files.
 #ifdef DEBUG_INFO
-    os << "nearest k nodes:\n";
+    os << "\nnearest k nodes:\n";
     for(auto p = o_cell.k_nearest_node.begin(); p!=o_cell.k_nearest_node.end(); ++p)
     {
         os << "\t" << *(p->p) << "\n";
@@ -66,6 +66,9 @@ void Graph::ComputeCell()
     cell.resize(0);
     double x_interval = (right_up_corner.x - left_down_corner.x) / n;
     double y_interval = (right_up_corner.y - left_down_corner.y) / n;
+#ifdef DEBUG_INFO
+    std::cout << "interval = " << x_interval << " " << y_interval << "\n";
+#endif
     for(size_t i = 0; i < n * n; ++i)
     {
         Node ld_c({(i / n) * x_interval + left_down_corner.x, (i % n) * y_interval + left_down_corner.y});
@@ -73,26 +76,19 @@ void Graph::ComputeCell()
         cell.emplace_back( ld_c, ru_c );
     }
 
-    NodeWithCenter node_with_center[node.size()];
-
-    for(auto &p : node)
+    for(auto const &p : node)
     {
         size_t cell_x = std::floor((p.x - left_down_corner.x) / x_interval);
         size_t cell_y = std::floor((p.y - left_down_corner.y) / y_interval);
+//the point on the most right (most up) should be in a cell
+        cell_x = std::min(cell_x, n-1);
+        cell_y = std::min(cell_y, n-1);
         cell[cell_x * n + cell_y].in_cell_node.push_back(&p);
-        node_with_center[index++].p = &p;
     }
     //find k nearest neighbor
-
-    class CentralizedCompare
-    {
-        public:
-        bool operator()(const NodeWithCenter& p1, const NodeWithCenter& p2) const
-        {
-            return DistanceSquare(*p1.p, *p1.Center) < DistanceSquare(*p2.p, *p2.Center);
-        }
-    };
-
+#ifdef DEBUG_INFO
+    std::cout << "find k nearest neighbor\n";
+#endif
     for(auto &one_cell : cell)
     {
         one_cell.center = Node({(one_cell.left_down_corner.x + one_cell.right_up_corner.x) / 2,
